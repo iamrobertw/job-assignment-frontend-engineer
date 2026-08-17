@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import { Link, NavLink } from "react-router-dom";
 
 type LayoutProps = {
   children: ReactNode;
@@ -9,37 +10,37 @@ export default function Layout({ children }: LayoutProps): JSX.Element {
     <>
       <nav className="navbar navbar-light">
         <div className="container">
-          <a className="navbar-brand" href="/#">
+          <Link className="navbar-brand" to="/">
             conduit
-          </a>
+          </Link>
           <ul className="nav navbar-nav pull-xs-right">
             <li className="nav-item">
-              {/* Add "active" class when you're on that page" */}
-              <a className="nav-link active" href="/#">
+              {/* NavLink adds the "active" class the Conduit theme expects. */}
+              <NavLink className="nav-link" to="/" exact>
                 Home
-              </a>
+              </NavLink>
             </li>
             <li className="nav-item">
-              <a className="nav-link" href="/#/editor">
+              <NavLink className="nav-link" to="/editor">
                 <i className="ion-compose" />
                 &nbsp;New Article
-              </a>
+              </NavLink>
             </li>
             <li className="nav-item">
-              <a className="nav-link" href="/#/settings">
+              <NavLink className="nav-link" to="/settings">
                 <i className="ion-gear-a" />
                 &nbsp;Settings
-              </a>
+              </NavLink>
             </li>
             <li className="nav-item">
-              <a className="nav-link" href="/#/login">
+              <NavLink className="nav-link" to="/login">
                 Sign in
-              </a>
+              </NavLink>
             </li>
             <li className="nav-item">
-              <a className="nav-link" href="/#/register">
+              <NavLink className="nav-link" to="/register">
                 Sign up
-              </a>
+              </NavLink>
             </li>
           </ul>
         </div>
@@ -49,9 +50,9 @@ export default function Layout({ children }: LayoutProps): JSX.Element {
 
       <footer>
         <div className="container">
-          <a href="/#" className="logo-font">
+          <Link to="/" className="logo-font">
             conduit
-          </a>
+          </Link>
           <span className="attribution">
             An interactive learning project from <a href="https://thinkster.io">Thinkster</a>. Code &amp; design
             licensed under MIT.
