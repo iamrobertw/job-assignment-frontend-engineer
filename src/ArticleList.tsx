@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { Article, getArticles } from "./api";
+import AuthorImage from "./AuthorImage";
 import { formatDate } from "./date";
 
 export default function ArticleList() {
@@ -105,7 +106,7 @@ export default function ArticleList() {
                 <div className="article-preview" key={article.slug}>
                   <div className="article-meta">
                     <a href={`/#/profile/${article.author.username}`}>
-                      <img src={article.author.image} alt={article.author.username} />
+                      <AuthorImage image={article.author.image} username={article.author.username} />
                     </a>
                     <div className="info">
                       <a href={`/#/profile/${article.author.username}`} className="author">
