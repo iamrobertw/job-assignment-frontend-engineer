@@ -3,20 +3,23 @@ import { useParams } from "react-router-dom";
 
 import { Article as ArticleModel, getArticle } from "./api";
 import ArticleMeta from "./ArticleMeta";
+import { useAuth } from "./auth";
 import Layout from "./Layout";
 
 export default function Article(): JSX.Element {
   const { slug } = useParams<{ slug: string }>();
+  const { user } = useAuth();
   const [article, setArticle] = useState<ArticleModel | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Signing in and out changes whether the article comes back as favorited, so it is fetched again.
   useEffect(() => {
     const controller = new AbortController();
 
     const loadArticle = async () => {
       try {
-        setArticle(await getArticle(slug, controller.signal));
+        setArticle(await getArticle(slug, user?.token, controller.signal));
       } catch (fetchError) {
         // Aborting on unmount rejects the request as well, but then there is nobody left to inform.
         if (!controller.signal.aborted) {
@@ -32,7 +35,9 @@ export default function Article(): JSX.Element {
     loadArticle();
 
     return () => controller.abort();
-  }, [slug]);
+  }, [slug, user]);
+
+  const handleFavoriteToggled = (updated: ArticleModel) => setArticle(updated);
 
   return (
     <Layout>
@@ -46,7 +51,7 @@ export default function Article(): JSX.Element {
             <div className="container">
               <h1>{article.title}</h1>
 
-              <ArticleMeta article={article} />
+              <ArticleMeta article={article} onFavoriteToggled={handleFavoriteToggled} />
             </div>
           </div>
 
@@ -63,7 +68,7 @@ export default function Article(): JSX.Element {
             <hr />
 
             <div className="article-actions">
-              <ArticleMeta article={article} />
+              <ArticleMeta article={article} onFavoriteToggled={handleFavoriteToggled} />
             </div>
 
             <div className="row">

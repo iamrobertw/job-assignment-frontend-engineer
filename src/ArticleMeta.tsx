@@ -1,14 +1,39 @@
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { Link, useHistory } from "react-router-dom";
 
-import { Article } from "./api";
+import { Article, setFavorite } from "./api";
+import { useAuth } from "./auth";
 import AuthorImage from "./AuthorImage";
 import { formatDate } from "./date";
 
 type ArticleMetaProps = {
   article: Article;
+  onFavoriteToggled: (article: Article) => void;
 };
 
-export default function ArticleMeta({ article }: ArticleMetaProps): JSX.Element {
+export default function ArticleMeta({ article, onFavoriteToggled }: ArticleMetaProps): JSX.Element {
+  const { user } = useAuth();
+  const history = useHistory();
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleFavorite = async () => {
+    if (!user) {
+      history.push("/login");
+
+      return;
+    }
+
+    setIsSaving(true);
+
+    try {
+      onFavoriteToggled(await setFavorite(article.slug, !article.favorited, user.token));
+    } catch (favoriteError) {
+      // Nothing on this block can report a failure, so the counter simply stays where it was.
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   return (
     <div className="article-meta">
       <Link to={`/profile/${article.author.username}`}>
@@ -27,9 +52,14 @@ export default function ArticleMeta({ article }: ArticleMetaProps): JSX.Element 
         &nbsp; Follow {article.author.username}
       </button>
       &nbsp;&nbsp;
-      <button className="btn btn-sm btn-outline-primary">
+      <button
+        className={`btn btn-sm ${article.favorited ? "btn-primary" : "btn-outline-primary"}`}
+        onClick={handleFavorite}
+        disabled={isSaving}
+      >
         <i className="ion-heart" />
-        &nbsp; Favorite Post <span className="counter">({article.favoritesCount})</span>
+        &nbsp; {article.favorited ? "Unfavorite" : "Favorite"} Post{" "}
+        <span className="counter">({article.favoritesCount})</span>
       </button>
     </div>
   );

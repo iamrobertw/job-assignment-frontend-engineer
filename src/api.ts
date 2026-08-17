@@ -78,8 +78,8 @@ export async function getArticles(
   return articles;
 }
 
-export async function getArticle(slug: string, signal?: AbortSignal): Promise<Article> {
-  const response = await fetch(`${apiUrl}/articles/${slug}`, { signal });
+export async function getArticle(slug: string, token?: string, signal?: AbortSignal): Promise<Article> {
+  const response = await fetch(`${apiUrl}/articles/${slug}`, { headers: authHeaders(token), signal });
 
   if (!response.ok) {
     throw new Error(`Could not fetch the article, the API responded with ${response.status}.`);
