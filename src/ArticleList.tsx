@@ -14,7 +14,7 @@ export default function ArticleList() {
 
     const loadArticles = async () => {
       try {
-        setArticles(await getArticles(controller.signal));
+        setArticles(await getArticles({}, controller.signal));
       } catch (fetchError) {
         // Aborting on unmount rejects the request as well, but then there is nobody left to inform.
         if (!controller.signal.aborted) {

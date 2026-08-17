@@ -30,8 +30,22 @@ type SingleArticleResponse = {
   article: Article;
 };
 
-export async function getArticles(signal?: AbortSignal): Promise<Article[]> {
-  const response = await fetch(`${apiUrl}/articles`, { signal });
+type ProfileResponse = {
+  profile: Profile;
+};
+
+type ArticleFilter = {
+  author?: string;
+};
+
+export async function getArticles(filter: ArticleFilter = {}, signal?: AbortSignal): Promise<Article[]> {
+  const query = new URLSearchParams();
+
+  if (filter.author) {
+    query.set("author", filter.author);
+  }
+
+  const response = await fetch(`${apiUrl}/articles?${query}`, { signal });
 
   if (!response.ok) {
     throw new Error(`Could not fetch articles, the API responded with ${response.status}.`);
@@ -52,4 +66,16 @@ export async function getArticle(slug: string, signal?: AbortSignal): Promise<Ar
   const { article }: SingleArticleResponse = await response.json();
 
   return article;
+}
+
+export async function getProfile(username: string, signal?: AbortSignal): Promise<Profile> {
+  const response = await fetch(`${apiUrl}/profiles/${username}`, { signal });
+
+  if (!response.ok) {
+    throw new Error(`Could not fetch the profile, the API responded with ${response.status}.`);
+  }
+
+  const { profile }: ProfileResponse = await response.json();
+
+  return profile;
 }
