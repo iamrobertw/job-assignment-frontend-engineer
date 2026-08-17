@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useContext, useState } from "react";
+import { createContext, ReactNode, useCallback, useContext, useState } from "react";
 
 import { login, User } from "./api";
 
@@ -26,6 +26,7 @@ function readStoredUser(): User | null {
 type AuthContextValue = {
   user: User | null;
   signIn: (email: string, password: string) => Promise<void>;
+  signOut: () => void;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -44,7 +45,13 @@ export function AuthProvider({ children }: AuthProviderProps): JSX.Element {
     setUser(signedInUser);
   };
 
-  return <AuthContext.Provider value={{ user, signIn }}>{children}</AuthContext.Provider>;
+  // Memoised because the sign out page runs it from an effect, where an unstable function loops.
+  const signOut = useCallback(() => {
+    window.localStorage.removeItem(storageKey);
+    setUser(null);
+  }, []);
+
+  return <AuthContext.Provider value={{ user, signIn, signOut }}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth(): AuthContextValue {
