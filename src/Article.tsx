@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 import { Article as ArticleModel, getArticle } from "./api";
-import AuthorImage from "./AuthorImage";
-import { formatDate } from "./date";
+import ArticleMeta from "./ArticleMeta";
 import Layout from "./Layout";
 
 export default function Article(): JSX.Element {
@@ -47,28 +46,7 @@ export default function Article(): JSX.Element {
             <div className="container">
               <h1>{article.title}</h1>
 
-              <div className="article-meta">
-                <Link to={`/profile/${article.author.username}`}>
-                  <AuthorImage image={article.author.image} username={article.author.username} />
-                </Link>
-                <div className="info">
-                  <Link to={`/profile/${article.author.username}`} className="author">
-                    {article.author.username}
-                  </Link>
-                  <time className="date" dateTime={article.createdAt}>
-                    {formatDate(article.createdAt)}
-                  </time>
-                </div>
-                <button className="btn btn-sm btn-outline-secondary">
-                  <i className="ion-plus-round" />
-                  &nbsp; Follow {article.author.username}
-                </button>
-                &nbsp;&nbsp;
-                <button className="btn btn-sm btn-outline-primary">
-                  <i className="ion-heart" />
-                  &nbsp; Favorite Post <span className="counter">({article.favoritesCount})</span>
-                </button>
-              </div>
+              <ArticleMeta article={article} />
             </div>
           </div>
 
@@ -85,28 +63,7 @@ export default function Article(): JSX.Element {
             <hr />
 
             <div className="article-actions">
-              <div className="article-meta">
-                <Link to={`/profile/${article.author.username}`}>
-                  <AuthorImage image={article.author.image} username={article.author.username} />
-                </Link>
-                <div className="info">
-                  <Link to={`/profile/${article.author.username}`} className="author">
-                    {article.author.username}
-                  </Link>
-                  <time className="date" dateTime={article.createdAt}>
-                    {formatDate(article.createdAt)}
-                  </time>
-                </div>
-                <button className="btn btn-sm btn-outline-secondary">
-                  <i className="ion-plus-round" />
-                  &nbsp; Follow {article.author.username}
-                </button>
-                &nbsp;
-                <button className="btn btn-sm btn-outline-primary">
-                  <i className="ion-heart" />
-                  &nbsp; Favorite Post <span className="counter">({article.favoritesCount})</span>
-                </button>
-              </div>
+              <ArticleMeta article={article} />
             </div>
 
             <div className="row">
