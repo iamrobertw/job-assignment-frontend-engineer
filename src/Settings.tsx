@@ -1,6 +1,6 @@
 import Layout from "./Layout";
 
-export default function Settings() {
+export default function Settings(): JSX.Element {
   return (
     <Layout>
       <div className="settings-page">

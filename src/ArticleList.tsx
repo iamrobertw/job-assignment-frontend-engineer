@@ -5,7 +5,7 @@ import ArticlePreview from "./ArticlePreview";
 import { useAuth } from "./auth";
 import Layout from "./Layout";
 
-export default function ArticleList() {
+export default function ArticleList(): JSX.Element {
   const { user } = useAuth();
   const [articles, setArticles] = useState<Article[]>([]);
   const [isLoading, setIsLoading] = useState(true);
