@@ -1,5 +1,15 @@
 # Assignment for Frontend Engineer job applicants
 
+## Implementation notes and limitations
+
+Three implementation details are worth noting before the review.
+
+**The follower count is not displayed.** The specification asks for a follow button with a follower count, but the provided API does not expose that information. The `Profile` model in `docs/schema/swagger.json` contains only `username`, `bio`, `image` and `following`, and no endpoint returns follower totals. The follow button therefore reflects and updates the supported follow state without displaying an invented count.
+
+**Markdown rendering is partial.** Markdown conversion was listed as optional. Article bodies preserve paragraph breaks, while the remaining Markdown syntax is displayed as plain text. The implementation was kept focused on the required functionality.
+
+**The stylesheet is served locally.** The skeleton references `demo.productionready.io/main.css`, which currently returns 404. The Conduit stylesheet is therefore served from `public/`. The application design remains unchanged.
+
 ## Background
 
 Your task is to implement a simple CRUD application. The application is based on [Conduit, "The mother of all demo apps"](https://github.com/gothinkster/realworld), which is a simple clone of [Medium.com](https://medium.com/). The demo of the application can be found at https://demo.realworld.io/.
