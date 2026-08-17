@@ -90,8 +90,9 @@ export async function getArticle(slug: string, token?: string, signal?: AbortSig
   return article;
 }
 
-export async function getProfile(username: string, signal?: AbortSignal): Promise<Profile> {
-  const response = await fetch(`${apiUrl}/profiles/${username}`, { signal });
+export async function getProfile(username: string, token?: string, signal?: AbortSignal): Promise<Profile> {
+  // Without the token the API reports every profile as not followed.
+  const response = await fetch(`${apiUrl}/profiles/${username}`, { headers: authHeaders(token), signal });
 
   if (!response.ok) {
     throw new Error(`Could not fetch the profile, the API responded with ${response.status}.`);
@@ -133,4 +134,19 @@ export async function setFavorite(slug: string, favorited: boolean, token: strin
   const { article }: SingleArticleResponse = await response.json();
 
   return article;
+}
+
+export async function setFollow(username: string, following: boolean, token: string): Promise<Profile> {
+  const response = await fetch(`${apiUrl}/profiles/${username}/follow`, {
+    method: following ? "POST" : "DELETE",
+    headers: authHeaders(token),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Could not change the follow state, the API responded with ${response.status}.`);
+  }
+
+  const { profile }: ProfileResponse = await response.json();
+
+  return profile;
 }

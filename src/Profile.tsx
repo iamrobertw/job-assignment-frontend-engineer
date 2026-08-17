@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useHistory, useParams } from "react-router-dom";
 
-import { Article, getArticles, getProfile, Profile as ProfileModel } from "./api";
+import { Article, getArticles, getProfile, Profile as ProfileModel, setFollow } from "./api";
 import ArticlePreview from "./ArticlePreview";
 import { useAuth } from "./auth";
 import AuthorImage from "./AuthorImage";
@@ -10,10 +10,12 @@ import Layout from "./Layout";
 export default function Profile(): JSX.Element {
   const { username } = useParams<{ username: string }>();
   const { user } = useAuth();
+  const history = useHistory();
   const [profile, setProfile] = useState<ProfileModel | null>(null);
   const [articles, setArticles] = useState<Article[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -22,7 +24,7 @@ export default function Profile(): JSX.Element {
       try {
         // The page needs both resources anyway, so they travel in parallel rather than one after another.
         const [loadedProfile, loadedArticles] = await Promise.all([
-          getProfile(username, controller.signal),
+          getProfile(username, user?.token, controller.signal),
           getArticles({ author: username }, user?.token, controller.signal),
         ]);
 
@@ -45,6 +47,25 @@ export default function Profile(): JSX.Element {
     return () => controller.abort();
   }, [username, user]);
 
+  // Takes the profile as an argument because the button only renders once it has been loaded.
+  const handleFollow = async (current: ProfileModel) => {
+    if (!user) {
+      history.push("/login");
+
+      return;
+    }
+
+    setIsSaving(true);
+
+    try {
+      setProfile(await setFollow(current.username, !current.following, user.token));
+    } catch (followError) {
+      // Nothing on this page can report a failure, so the button simply stays as it was.
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   const handleFavoriteToggled = (updated: Article) =>
     setArticles(current => current.map(article => (article.slug === updated.slug ? updated : article)));
 
@@ -63,9 +84,13 @@ export default function Profile(): JSX.Element {
                   <AuthorImage image={profile.image} username={profile.username} className="user-img" />
                   <h4>{profile.username}</h4>
                   <p>{profile.bio}</p>
-                  <button className="btn btn-sm btn-outline-secondary action-btn">
+                  <button
+                    className={`btn btn-sm ${profile.following ? "btn-secondary" : "btn-outline-secondary"} action-btn`}
+                    onClick={() => handleFollow(profile)}
+                    disabled={isSaving}
+                  >
                     <i className="ion-plus-round" />
-                    &nbsp; Follow {profile.username}
+                    &nbsp; {profile.following ? "Unfollow" : "Follow"} {profile.username}
                   </button>
                 </div>
               </div>
