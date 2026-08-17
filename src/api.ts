@@ -30,8 +30,20 @@ type SingleArticleResponse = {
   article: Article;
 };
 
+export type User = {
+  email: string;
+  token: string;
+  username: string;
+  bio: string;
+  image: string;
+};
+
 type ProfileResponse = {
   profile: Profile;
+};
+
+type UserResponse = {
+  user: User;
 };
 
 type ArticleFilter = {
@@ -78,4 +90,20 @@ export async function getProfile(username: string, signal?: AbortSignal): Promis
   const { profile }: ProfileResponse = await response.json();
 
   return profile;
+}
+
+export async function login(email: string, password: string): Promise<User> {
+  const response = await fetch(`${apiUrl}/users/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ user: { email, password } }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Could not sign in, the API responded with ${response.status}.`);
+  }
+
+  const { user }: UserResponse = await response.json();
+
+  return user;
 }
