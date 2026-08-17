@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 import { Article, getArticles } from "./api";
 import AuthorImage from "./AuthorImage";
@@ -105,13 +106,13 @@ export default function ArticleList() {
               {articles.map(article => (
                 <div className="article-preview" key={article.slug}>
                   <div className="article-meta">
-                    <a href={`/#/profile/${article.author.username}`}>
+                    <Link to={`/profile/${article.author.username}`}>
                       <AuthorImage image={article.author.image} username={article.author.username} />
-                    </a>
+                    </Link>
                     <div className="info">
-                      <a href={`/#/profile/${article.author.username}`} className="author">
+                      <Link to={`/profile/${article.author.username}`} className="author">
                         {article.author.username}
-                      </a>
+                      </Link>
                       <time className="date" dateTime={article.createdAt}>
                         {formatDate(article.createdAt)}
                       </time>
@@ -120,11 +121,11 @@ export default function ArticleList() {
                       <i className="ion-heart" /> {article.favoritesCount}
                     </button>
                   </div>
-                  <a href={`/#/${article.slug}`} className="preview-link">
+                  <Link to={`/${article.slug}`} className="preview-link">
                     <h1>{article.title}</h1>
                     <p>{article.description}</p>
                     <span>Read more...</span>
-                  </a>
+                  </Link>
                 </div>
               ))}
             </div>
