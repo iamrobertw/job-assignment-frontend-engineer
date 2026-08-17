@@ -3,11 +3,13 @@ import { useParams } from "react-router-dom";
 
 import { Article, getArticles, getProfile, Profile as ProfileModel } from "./api";
 import ArticlePreview from "./ArticlePreview";
+import { useAuth } from "./auth";
 import AuthorImage from "./AuthorImage";
 import Layout from "./Layout";
 
 export default function Profile(): JSX.Element {
   const { username } = useParams<{ username: string }>();
+  const { user } = useAuth();
   const [profile, setProfile] = useState<ProfileModel | null>(null);
   const [articles, setArticles] = useState<Article[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -21,7 +23,7 @@ export default function Profile(): JSX.Element {
         // The page needs both resources anyway, so they travel in parallel rather than one after another.
         const [loadedProfile, loadedArticles] = await Promise.all([
           getProfile(username, controller.signal),
-          getArticles({ author: username }, controller.signal),
+          getArticles({ author: username }, user?.token, controller.signal),
         ]);
 
         setProfile(loadedProfile);
@@ -41,7 +43,10 @@ export default function Profile(): JSX.Element {
     loadPage();
 
     return () => controller.abort();
-  }, [username]);
+  }, [username, user]);
+
+  const handleFavoriteToggled = (updated: Article) =>
+    setArticles(current => current.map(article => (article.slug === updated.slug ? updated : article)));
 
   return (
     <Layout>
@@ -86,7 +91,7 @@ export default function Profile(): JSX.Element {
                 </div>
 
                 {articles.map(article => (
-                  <ArticlePreview key={article.slug} article={article} />
+                  <ArticlePreview key={article.slug} article={article} onFavoriteToggled={handleFavoriteToggled} />
                 ))}
               </div>
             </div>

@@ -50,14 +50,24 @@ type ArticleFilter = {
   author?: string;
 };
 
-export async function getArticles(filter: ArticleFilter = {}, signal?: AbortSignal): Promise<Article[]> {
+// Keep the token in a single place to avoid inconsistent auth headers.
+function authHeaders(token?: string): HeadersInit {
+  return token ? { Authorization: `Token ${token}` } : {};
+}
+
+export async function getArticles(
+  filter: ArticleFilter = {},
+  token?: string,
+  signal?: AbortSignal
+): Promise<Article[]> {
   const query = new URLSearchParams();
 
   if (filter.author) {
     query.set("author", filter.author);
   }
 
-  const response = await fetch(`${apiUrl}/articles?${query}`, { signal });
+  // Without the token the API reports every article as not favorited.
+  const response = await fetch(`${apiUrl}/articles?${query}`, { headers: authHeaders(token), signal });
 
   if (!response.ok) {
     throw new Error(`Could not fetch articles, the API responded with ${response.status}.`);
@@ -106,4 +116,21 @@ export async function login(email: string, password: string): Promise<User> {
   const { user }: UserResponse = await response.json();
 
   return user;
+}
+
+// One function rather than two near-identical ones: the flag only picks the HTTP method,
+// and call sites always pass the opposite of the current state.
+export async function setFavorite(slug: string, favorited: boolean, token: string): Promise<Article> {
+  const response = await fetch(`${apiUrl}/articles/${slug}/favorite`, {
+    method: favorited ? "POST" : "DELETE",
+    headers: authHeaders(token),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Could not change the favorite, the API responded with ${response.status}.`);
+  }
+
+  const { article }: SingleArticleResponse = await response.json();
+
+  return article;
 }

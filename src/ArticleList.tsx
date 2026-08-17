@@ -2,19 +2,22 @@ import { useEffect, useState } from "react";
 
 import { Article, getArticles } from "./api";
 import ArticlePreview from "./ArticlePreview";
+import { useAuth } from "./auth";
 import Layout from "./Layout";
 
 export default function ArticleList() {
+  const { user } = useAuth();
   const [articles, setArticles] = useState<Article[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Signing in and out changes which articles come back as favorited, so the list is fetched again.
   useEffect(() => {
     const controller = new AbortController();
 
     const loadArticles = async () => {
       try {
-        setArticles(await getArticles({}, controller.signal));
+        setArticles(await getArticles({}, user?.token, controller.signal));
       } catch (fetchError) {
         // Aborting on unmount rejects the request as well, but then there is nobody left to inform.
         if (!controller.signal.aborted) {
@@ -30,7 +33,10 @@ export default function ArticleList() {
     loadArticles();
 
     return () => controller.abort();
-  }, []);
+  }, [user]);
+
+  const handleFavoriteToggled = (updated: Article) =>
+    setArticles(current => current.map(article => (article.slug === updated.slug ? updated : article)));
 
   return (
     <Layout>
@@ -65,7 +71,7 @@ export default function ArticleList() {
               {error && <div className="article-preview">{error}</div>}
 
               {articles.map(article => (
-                <ArticlePreview key={article.slug} article={article} />
+                <ArticlePreview key={article.slug} article={article} onFavoriteToggled={handleFavoriteToggled} />
               ))}
             </div>
 
