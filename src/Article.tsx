@@ -4,6 +4,7 @@ import { Link, useParams } from "react-router-dom";
 import { Article as ArticleModel, getArticle } from "./api";
 import AuthorImage from "./AuthorImage";
 import { formatDate } from "./date";
+import Layout from "./Layout";
 
 export default function Article(): JSX.Element {
   const { slug } = useParams<{ slug: string }>();
@@ -35,45 +36,7 @@ export default function Article(): JSX.Element {
   }, [slug]);
 
   return (
-    <>
-      <nav className="navbar navbar-light">
-        <div className="container">
-          <a className="navbar-brand" href="/#">
-            conduit
-          </a>
-          <ul className="nav navbar-nav pull-xs-right">
-            <li className="nav-item">
-              {/* Add "active" class when you're on that page" */}
-              <a className="nav-link active" href="/#">
-                Home
-              </a>
-            </li>
-            <li className="nav-item">
-              <a className="nav-link" href="/#/editor">
-                <i className="ion-compose" />
-                &nbsp;New Article
-              </a>
-            </li>
-            <li className="nav-item">
-              <a className="nav-link" href="/#/settings">
-                <i className="ion-gear-a" />
-                &nbsp;Settings
-              </a>
-            </li>
-            <li className="nav-item">
-              <a className="nav-link" href="/#/login">
-                Sign in
-              </a>
-            </li>
-            <li className="nav-item">
-              <a className="nav-link" href="/#/register">
-                Sign up
-              </a>
-            </li>
-          </ul>
-        </div>
-      </nav>
-
+    <Layout>
       {isLoading && <div className="container page">Loading article...</div>}
 
       {error && <div className="container page">{error}</div>}
@@ -198,18 +161,6 @@ export default function Article(): JSX.Element {
           </div>
         </div>
       )}
-
-      <footer>
-        <div className="container">
-          <a href="/#" className="logo-font">
-            conduit
-          </a>
-          <span className="attribution">
-            An interactive learning project from <a href="https://thinkster.io">Thinkster</a>. Code &amp; design
-            licensed under MIT.
-          </span>
-        </div>
-      </footer>
-    </>
+    </Layout>
   );
 }
