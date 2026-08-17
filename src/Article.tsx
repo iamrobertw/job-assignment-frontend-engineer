@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { Article as ArticleModel, getArticle } from "./api";
+import { Article as ArticleModel, getArticle, Profile } from "./api";
 import ArticleMeta from "./ArticleMeta";
 import { useAuth } from "./auth";
 import Layout from "./Layout";
@@ -39,6 +39,9 @@ export default function Article(): JSX.Element {
 
   const handleFavoriteToggled = (updated: ArticleModel) => setArticle(updated);
 
+  // Following returns the author alone, so it has to be merged back into the article.
+  const handleFollowToggled = (author: Profile) => setArticle(current => (current ? { ...current, author } : current));
+
   return (
     <Layout>
       {isLoading && <div className="container page">Loading article...</div>}
@@ -51,7 +54,11 @@ export default function Article(): JSX.Element {
             <div className="container">
               <h1>{article.title}</h1>
 
-              <ArticleMeta article={article} onFavoriteToggled={handleFavoriteToggled} />
+              <ArticleMeta
+                article={article}
+                onFavoriteToggled={handleFavoriteToggled}
+                onFollowToggled={handleFollowToggled}
+              />
             </div>
           </div>
 
@@ -68,7 +75,11 @@ export default function Article(): JSX.Element {
             <hr />
 
             <div className="article-actions">
-              <ArticleMeta article={article} onFavoriteToggled={handleFavoriteToggled} />
+              <ArticleMeta
+                article={article}
+                onFavoriteToggled={handleFavoriteToggled}
+                onFollowToggled={handleFollowToggled}
+              />
             </div>
 
             <div className="row">
