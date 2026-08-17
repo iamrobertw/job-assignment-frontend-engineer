@@ -26,6 +26,10 @@ type MultipleArticlesResponse = {
   articlesCount: number;
 };
 
+type SingleArticleResponse = {
+  article: Article;
+};
+
 export async function getArticles(signal?: AbortSignal): Promise<Article[]> {
   const response = await fetch(`${apiUrl}/articles`, { signal });
 
@@ -36,4 +40,16 @@ export async function getArticles(signal?: AbortSignal): Promise<Article[]> {
   const { articles }: MultipleArticlesResponse = await response.json();
 
   return articles;
+}
+
+export async function getArticle(slug: string, signal?: AbortSignal): Promise<Article> {
+  const response = await fetch(`${apiUrl}/articles/${slug}`, { signal });
+
+  if (!response.ok) {
+    throw new Error(`Could not fetch the article, the API responded with ${response.status}.`);
+  }
+
+  const { article }: SingleArticleResponse = await response.json();
+
+  return article;
 }
