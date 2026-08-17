@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { Article, getArticles } from "./api";
+import { formatDate } from "./date";
 
 export default function ArticleList() {
   const [articles, setArticles] = useState<Article[]>([]);
@@ -110,7 +111,9 @@ export default function ArticleList() {
                       <a href={`/#/profile/${article.author.username}`} className="author">
                         {article.author.username}
                       </a>
-                      <span className="date">{article.createdAt}</span>
+                      <time className="date" dateTime={article.createdAt}>
+                        {formatDate(article.createdAt)}
+                      </time>
                     </div>
                     <button className="btn btn-outline-primary btn-sm pull-xs-right">
                       <i className="ion-heart" /> {article.favoritesCount}
